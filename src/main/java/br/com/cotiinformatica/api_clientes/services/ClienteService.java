@@ -2,11 +2,19 @@ package br.com.cotiinformatica.api_clientes.services;
 
 import br.com.cotiinformatica.api_clientes.dtos.ClienteRequest;
 import br.com.cotiinformatica.api_clientes.entities.Cliente;
+import br.com.cotiinformatica.api_clientes.entities.Endereco;
 import br.com.cotiinformatica.api_clientes.repositories.ClienteRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
+@Service
 public class ClienteService {
+
+    @Autowired
+    private ClienteRepository clienteRepository;
 
     //Método para desenvolver as regras de negócio para cadastro do cliente
     public void cadastrarCliente(ClienteRequest request) throws Exception {
@@ -22,14 +30,32 @@ public class ClienteService {
             throw new IllegalArgumentException("O CPF do cliente é obrigatório e deve conter exatamente 11 dígitos numéricos.");
         }
 
-        var clienteRepository = new ClienteRepository();
-        if(ClienteRepository.cpfExistente(request.cpf())){
+        if (request.enderecos() == null || request.enderecos().length == 0) {
+            throw new IllegalArgumentException("O cliente deve possuir pelo menos um endereço cadastrado.");
+        }
+
+        if(clienteRepository.cpfExistente(request.cpf())){
             throw new IllegalArgumentException("O CPF do cliente já está cadastrado no sistema.");
         }
 
         var cliente = new Cliente();
+        cliente.setEnderecos(new ArrayList<>()); //Instanciando a lista de endereços do cliente
+
         cliente.setNome(request.nome());
         cliente.setCpf(cpfLimpo);
+
+        for(var item : request.enderecos()) {
+            var endereco = new Endereco();
+            endereco.setLogradouro(item.logradouro());
+            endereco.setNumero(item.numero());
+            endereco.setComplemento(item.complemento());
+            endereco.setBairro(item.bairro());
+            endereco.setCidade(item.cidade());
+            endereco.setEstado(item.estado());
+            endereco.setCep(item.cep());
+
+            cliente.getEnderecos().add(endereco); //Adiciona o endereço ao cliente
+        }
 
         clienteRepository.inserir(cliente);
     }
@@ -43,7 +69,6 @@ public class ClienteService {
         }
         //Consultar os clientes no banco de dados
         else {
-            var clienteRepository = new ClienteRepository();
             var lista = clienteRepository.listar(nome);
 
             return lista;

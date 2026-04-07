@@ -1,15 +1,24 @@
 package br.com.cotiinformatica.api_clientes.factories;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Component;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 
+@Component
 public class ConnectionFactory {
-    //Conexão com o banco de dados
-    public static Connection getConnection() throws Exception {
-        var host = "jdbc:postgresql://localhost:5432/db-api-clientes";
-        var user = "postgres";
-        var pass = "Flv@1997";
 
+    //Pegando valores do arquivo application.properties e atribuindo a variaveis privadas.
+    @Value("${datasource.host}")
+    private String host;
+    @Value("${datasource.user}")
+    private String user;
+    @Value("${datasource.pass}")
+    private String pass;
+
+    //Conexão com o banco de dados
+    public Connection getConnection() throws Exception {
         return DriverManager.getConnection(host, user, pass);
     }
 }
