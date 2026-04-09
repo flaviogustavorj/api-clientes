@@ -74,4 +74,12 @@ public class ClienteService {
             return lista;
         }
     }
+
+    //Método para executar a exclusão do cliente
+    public void excluirCliente(Integer id) throws Exception {
+        var result = clienteRepository.excluir(id);
+        if (!result) {
+            throw new IllegalArgumentException("Não foi possível excluir o cliente.");
+        }
+    }
 }

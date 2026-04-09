@@ -47,4 +47,19 @@ public class ClienteController {
             return ResponseEntity.status(500).body("Erro ao consultar cliente: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("excluir/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+        try {
+            clienteService.excluirCliente(id);
+
+            return ResponseEntity.status(200).body("Cliente excluído com sucesso!");
+        }
+        catch (IllegalArgumentException e) {
+            return ResponseEntity.status(400).body("Erro ao excluir cliente: " + e.getMessage());
+        }
+        catch (Exception e) {
+            return ResponseEntity.status(500).body("Erro ao excluir cliente: " + e.getMessage());
+        }
+    }
 }
